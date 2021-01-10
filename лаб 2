@@ -1,0 +1,85 @@
+пакет основной
+
+импорт (
+	"fmt"
+	"io"
+	"net / http"
+	"ОС"
+	- путь"
+	- время"
+	"strconv"
+)
+
+тип temp struct{
+	скачано int64
+	все int64
+	time int
+}
+
+func (tmp *temp) Write(B []byte) (int, error){
+	n := len(b)
+	tmp.загружено += int64(n)
+	возврат n, nil
+}
+
+func print(tmp *temp) {
+	fmt.Println(tmp.downloaded/1024, "kilobytes downloaded from", tmp.all/1024, "kilobytes")
+}
+
+ func countingBytes(tmp *temp){
+	for {
+		time.Sleep(time.Second)
+		tmp.time++
+		print(tmp)
+	}
+}
+
+func downloadFile(fileURL string) error{
+
+	resp, err := http.Get(fileURL)
+	if err != nil{
+		return err
+	}
+	defer resp.Body.Close()
+
+	out, err := os.Create(path.Base(resp.Request.URL.String()))
+	if err != nil{
+		return err
+	}
+
+	contentLength := resp.Header.Get("content-length")
+	length, err := strconv.Atoi(contentLength)
+	if err != nil{
+		return err
+	}
+
+	counter := &temp{}
+	counter.all = int64(length)
+	go countingBytes(counter)
+	if _, err = io.Copy(out, io.TeeReader(resp.Body, counter)); err != nil{
+		return err
+	}
+
+	fmt.Println(counter.all/1024, "kilobytes downloaded from", counter.all/1024, "kilobytes")
+
+	вонотсюда.()
+
+	возврат ноль
+}
+
+func main(){
+
+	  строка var fileURL
+	fmt.Println("Ваш url: ")
+	fmt.Scanf("%s", &fileURL)
+
+	fmt.Println()
+
+	err := downloadFile(fileURL)
+	если err ! = nil{
+		паника(err)
+	}
+	
+	fmt.Println()
+	fmt.Println("готово!")
+}
